@@ -1,11 +1,14 @@
 const { Router } = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const verifyToken = require("./verifyToken");
 
 const router = Router();
 
-router.get("/me", async (req, res, next) => {
-  res.json("me");
+router.get("/me", verifyToken, async (req, res, next) => {
+  const user = await User.findById(req.userId, { password: 0 });
+  if(!user) return res.status(404).send("No user found");
+  res.json(user);
 });
 
 router.post("/signup", async (req, res, next) => {
